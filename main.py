@@ -1,6 +1,7 @@
 import re
 from bs4 import BeautifulSoup
 import requests
+import pandas as pd 
 
 '''
 Link
@@ -19,9 +20,63 @@ web = requests.get(url, headers=headers)
 txt = BeautifulSoup(web.text, 'html.parser')
 filter_ul = txt.find_all(['ul'], id='menu-menu')
 
+'''
 with open('links.txt', 'w',encoding='utf-8') as txt:
         for filter in filter_ul:
             f = filter.find_all(['li'], class_=re.compile('^menu-*'))
             for link in f:
                 add_link = link.find('a')
                 txt.write(f'{add_link.get('href')}\n')
+'''
+
+#category link to list
+links = []
+for filter in filter_ul:
+    f = filter.find_all(['li'], class_=re.compile('^menu-*'))
+    for link in f:
+        add_link = link.find('a')
+        links.append(add_link.get('href'))
+
+
+#Layer 2 Crawler
+url = links[1]
+web = requests.get(url, headers=headers)
+html = BeautifulSoup(web.text, 'html.parser')
+
+cp_post = html.find_all('div', id=re.compile(r'^post-\d+'))
+# print(cp_post)
+post_data = []
+for post in cp_post:
+    #img
+    post_img = post.find('img', class_='attachment-140x140')
+    img_text = post_img.get('src') if post_img else " "
+    #title
+
+    post_title = post.find('h2', class_="title")
+    title_text = post_title.get_text(strip=True) if post_title else ' '
+    #date
+    post_date = post.find('div', class_='post-date')
+    date_text = post_date.get_text(strip=True) if post_date else ' '
+    #Category
+    post_info = post.find('div', class_='post-info')
+    if post_info:
+        cate = post_info.find_all('a', attrs={'title': True})
+        cate_text = ', '.join(i.get_text(strip=True)for i in cate)
+    else:
+        cate_text = ' '
+
+    #content
+    post_content = post.find('div', class_='post-content')
+    content_text = post_content.get_text(strip=True) if post_content else ' '
+    #write
+    post_data.append({
+        "Title": title_text,
+        "Img": img_text,
+        "Date": date_text,
+        "Category": cate_text,
+        "Content" : content_text
+    })
+
+df = pd.DataFrame(post_data)
+df.to_csv("posts.csv", index=False, encoding="utf-8-sig")
+print(f"saved")

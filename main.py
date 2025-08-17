@@ -26,12 +26,6 @@ for filter in filter_ul:
         links.append(add_link.get('href'))
 links.pop(0)
 
-page_count = 1 
-max_page = 2
-post_count = 1
-max_post = 200
-
-
 post_to_csv = []
 post_seen = set()
 
@@ -46,8 +40,6 @@ for link_web in links:
             break
 
         for post in cp_post: 
-            if post_count == max_post:
-                break
             post_title = post.find('h2', class_="title")
             title_text = post_title.get_text(strip=True) if post_title else ' '
 
@@ -79,17 +71,11 @@ for link_web in links:
                 "Category": cate_text,
                 "Content" : content_text
             })
-            post_count += 1 
 
-        if page_count >= max_page:
-            page_count = 0
-            break
-        
         #next
         next = html.find('a', class_='next')
         if next and next.get('href'):
             url = next['href']
-            page_count += 1
         else:
             break
 

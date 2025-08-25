@@ -1,84 +1,55 @@
-import re
-from bs4 import BeautifulSoup
 import requests
-import pandas as pd 
+import re
+import pandas as pd
 
-'''
-Link
-https://oceansofgamess.com/
-'''
+url1 = "https://oceanofgames.com/"
+web = requests.get(url1).text
 
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'
-}
+navbar = r'<li\sid="menu-item-[\d]*"\sclass="menu-[\w]*"><a\shref="([\w:/.-]*)">[\w\s]*<span\sclass="p"></span></a></li>'
+links = re.findall(navbar, web)
 
-url = 'https://oceansofgamess.com/'
-
-web = requests.get(url, headers=headers)
-txt = BeautifulSoup(web.text, 'html.parser')
-filter_ul = txt.find_all(['ul'], id='menu-menu')
-
-links = []
-for filter in filter_ul:
-    f = filter.find_all(['li'], class_=re.compile(r'menu-\D+'))
-    for link in f:
-        add_link = link.find('a')
-        links.append(add_link.get('href'))
-links.pop(0)
-
-post_to_csv = []
-post_seen = set()
-
-for link_web in links:
-    url = link_web
+all_posts = []
+ids_seen = set()
+url_seen = set()
+for link in links:
+    url2 = link
     while True:
-        web = requests.get(url, headers=headers)
-        html = BeautifulSoup(web.text, 'html.parser')
-        cp_post = html.find_all('div', id=re.compile(r'^post-\d+'))
-
-        if not cp_post:
+        if url2 in url_seen:
             break
-
-        for post in cp_post: 
-            post_title = post.find('h2', class_="title")
-            title_text = post_title.get_text(strip=True) if post_title else ' '
-
-            #check duplicate
-            if title_text in post_seen:
+        url_seen.add(url2)
+        div = requests.get(url2).text
+        if not div:
+            break
+        titles = re.findall(r'<a\sclass="post-thumb\s"\sid="thumb-[\d]*"\shref="[\w:/.-]*"\stitle="([\w\s.]*)">', div)
+        id = re.findall(r'<a\sclass="post-thumb\s"\sid="thumb-([\d]*)"', div)
+        imgs = re.findall(r'<img\swidth="140"\sheight="140"\ssrc="([\w:/.-]*)"', div)
+        dates = re.findall(r'<div\sclass="post-std\sclear-block">[\w\W]*?<div\sclass="post-date"><span\sclass="ext">([\d\s\w]+)</span></div>', div)
+        descriptions = re.findall(r'<div\sclass="post-content\sclear-block">[\w\W]*?([\w\W]+?)\s*[(]more&hellip;', div)
+        tag_blocks = re.findall(r'<div class="post-info">([\w\W]*?)</div>', div)
+        for i in id:
+            pid= i.strip()
+            if pid in ids_seen:
                 continue
-            post_seen.add(title_text)
-
-            post_img = post.find('img', class_='attachment-140x140')
-            img_text = post_img.get('src') if post_img else " "
-
-            post_date = post.find('div', class_='post-date')
-            date_text = post_date.get_text(strip=True) if post_date else ' '
-
-            post_info = post.find('div', class_='post-info')
-            if post_info:
-                cate = post_info.find_all('a', attrs={'title': True})
-                cate_text = ', '.join(i.get_text(strip=True)for i in cate)
-            else:
-                cate_text = ' '
-
-            post_content = post.find('div', class_='post-content')
-            content_text = post_content.get_text(strip=True) if post_content else ' '
+        ids_seen.add(pid)
+        for i in range(len(titles)):
+            tags = re.findall(r'\srel="tag"\stitle="([\w]+)', tag_blocks[i]) if i < len(tag_blocks) else []
+            post = {
+                "ID": id[i].strip() if i < len(id) else None,
+                "Title": titles[i].strip()if i < len(titles) else None,
+                "Tags": tags,
+                "Image": imgs[i].strip()if i < len(imgs) else None,
+                "Date": dates[i].strip()if i < len(dates) else None,
+                "Description": descriptions[i].strip()if i < len(descriptions) else None,
+            }
+            all_posts.append(post)
             
-            post_to_csv.append({
-                "Title": title_text,
-                "Img": img_text,
-                "Date": date_text,
-                "Category": cate_text,
-                "Content" : content_text
-            })
-
-        #next
-        next = html.find('a', class_='next')
-        if next and next.get('href'):
-            url = next['href']
+        next_page = re.findall(r'<a\s+class="next"\s+href="([^"]+)">', div)
+        if next_page:
+            url2 = next_page[0]
         else:
             break
 
-df = pd.DataFrame(post_to_csv)
+df = pd.DataFrame(all_posts)
 df.to_csv("data.csv", index=False, encoding="utf-8-sig")
 print(f"saved")
+    

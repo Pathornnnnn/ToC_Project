@@ -26,12 +26,11 @@ for link in links:
         dates = re.findall(r'<div\sclass="post-std\sclear-block">[\w\W]*?<div\sclass="post-date"><span\sclass="ext">([\d\s\w]+)</span></div>', div)
         descriptions = re.findall(r'<div\sclass="post-content\sclear-block">[\w\W]*?([\w\W]+?)\s*[(]more&hellip;', div)
         tag_blocks = re.findall(r'<div class="post-info">([\w\W]*?)</div>', div)
-        for i in id:
-            pid= i.strip()
-            if pid in ids_seen:
-                continue
-        ids_seen.add(pid)
+
         for i in range(len(titles)):
+            if id[i] in ids_seen:
+                continue
+            ids_seen.add(id[i])
             tags = re.findall(r'\srel="tag"\stitle="([\w]+)', tag_blocks[i]) if i < len(tag_blocks) else []
             post = {
                 "ID": id[i].strip() if i < len(id) else None,

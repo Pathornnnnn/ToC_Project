@@ -17,7 +17,7 @@ class Crawler:
         if link:
             return link[0]
         else:
-            return "None"
+            return
 
     def crawl(self, web_text):
         posts = []
@@ -38,10 +38,14 @@ class Crawler:
             web_text,
         )
         tag_blocks = re.findall(r'<div class="post-info">([\w\W]*?)</div>', web_text)
-
+        ids_seen = set()
         for i in range(len(titles)):
+            pid = ids[i].strip()
+            if pid in ids_seen:
+                continue
+            ids_seen.add(pid)
             tags = (
-                re.findall(r'\srel="tag"\stitle="([\w]+)', tag_blocks[i])
+                ", ".join(re.findall(r'\srel="tag"\stitle="([\w]+)', tag_blocks[i]))
                 if i < len(tag_blocks)
                 else []
             )
@@ -59,7 +63,19 @@ class Crawler:
 
         return posts
 
-    def crawl_loop(self, links_list: list, max_post_per_cate=10):
-        url = links_list
-        for web_travse in url:
-            pass
+    def crawl_loop(self, links_list: list, max_page_per_cate=2):
+        data = []
+        for web_travse in links_list:
+            web = self.fetch(web_travse)
+            if not web:
+                continue
+            page = 1
+            while page <= max_page_per_cate:
+                data += self.crawl(web)
+                next_page = self.next_page(web)
+                if next_page:
+                    web = self.fetch(next_page)
+                else:
+                    break
+                page += 1
+        return data

@@ -3,4 +3,10 @@ from module import *
 crawler = Crawler()
 exporter = Export()
 url = "https://oceanofgames.com/"
-data = crawler.crawl_loop(crawler.crawl_nav(crawler.fetch(url)), max_post_per_cate=10)
+
+
+# Sample
+web = crawler.fetch(url)
+links_cate = crawler.crawl_nav(web)
+data = crawler.crawl_loop(links_list=links_cate)
+exporter.export_csv(data, "data.csv")

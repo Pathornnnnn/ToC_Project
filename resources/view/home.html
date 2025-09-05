@@ -1,0 +1,159 @@
+<!-- templates/home.html -->
+{% extends "template.html" %}
+
+{% block content %}
+    <nav class="d-flex justify-content-center">
+        {% for category in categories %}
+        <a onclick="load_data('{{category}}')" name="{{category}}" style="cursor: pointer;" class="btn btn-secondary mx-1 my-1">{{category}}</a> <!--function onclick link call function reload data_list follow name category-->
+        {% endfor %}
+    </nav>
+    <div id="carouselExampleDark" class="carousel carousel-dark slide">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            </div>
+            <div class="carousel-inner">
+                <div class="carousel-item active" data-bs-interval="10000">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0ZLohhw4kPzzM9D0aGEccsgJgEqHPWQDbng&s" class="d-block w-100" alt="...">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>First slide label</h5>
+                    <p>Some representative placeholder content for the first slide.</p>
+                </div>
+                </div>
+                <div class="carousel-item" data-bs-interval="2000">
+                <img src="#" class="d-block w-100" alt="...">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Second slide label</h5>
+                    <p>Some representative placeholder content for the second slide.</p>
+                </div>
+                </div>
+                <div class="carousel-item">
+                <img src="#" class="d-block w-100" alt="...">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Third slide label</h5>
+                    <p>Some representative placeholder content for the third slide.</p>
+                </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+        <div class="row item-center">
+            <h2 class="mt-5">Game</h2>
+            <div class="col-4 mt-5">
+                <div class="card" style="width: 18rem;">
+                    <img src="#" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 mt-5">
+                <div class="card" style="width: 18rem;">
+                    <img src="#" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 mt-5">
+                <div class="card" style="width: 18rem;">
+                    <img src="#" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5" >
+            <h2 id="title_category">All</h2>
+            <div class="col-10" id="card_game">
+                {% for data in data_list %}
+                <div class="card-fluid mb-3 border border-dark rounded p-4" id="{{data.ID}}">
+                        <div class="row g-0 ">
+                            <div class="col-md-4">
+                            <img src="{{data.Image}}" class="img-fluid rounded-start" id="game_img" alt="#">
+                            </div>
+                            <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title" id="title_game">{{data.Title}}</h5>
+                                <p class="card-text" id="content_game">{{data.Content}}</p>
+                                <p class="card-text" id="categories">
+                                     Category: {{data.Tags}}
+                                </p>
+                                
+                            </div>
+                            </div>
+                        </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="col-2  border border-primary">
+                <H4>Something</H4>
+            </div>
+        </div>
+        <div class="row" id="paginate_row">
+            <nav aria-label="Pagination">
+                <ul class="pagination">
+                <!-- Previous -->
+                <li class="page-item {% if current_page <= 1 %}disabled{% endif %}">
+                    <a class="page-link" href="/?page={{ current_page - 1 }}">Previous</a>
+                </li>
+                <!-- Current page (highlight) -->
+                <li class="page-item active" aria-current="page">
+                    <a class="page-link" href="#">{{ current_page }}</a>
+                </li>
+                <!-- Next -->
+                <li class="page-item">
+                    <a class="page-link" href="/?page={{ current_page + 1 }}">Next</a>
+                </li>
+
+                </ul>
+            </nav>
+        </div>
+    <script>
+        async function load_data(name){
+            let category = name;
+            let data_list = await fetch(`/get_data_by_category/${category}`);
+            let data = await data_list.json();
+
+            document.getElementById('title_category').innerHTML = "<h2>" + category + "</h2>";
+            card_game = document.getElementById('card_game')
+            card_game.innerHTML = ``;
+            data.forEach(item => {
+                const li = document.createElement("div");
+                    li.innerHTML = `
+                    <div class="card-fluid mb-3 border border-dark rounded p-4" id="${item.ID}">
+                        <div class="row g-0 ">
+                            <div class="col-md-4">
+                            <img src="${item.Image}" class="img-fluid rounded-start" id="${item.Image}" alt="#">
+                            </div>
+                            <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title" id="${item.Title}">${item.Title}</h5>
+                                <p class="card-text" id="${item.Content}">${item.Content}</p>
+                                <p class="card-text" id="${item.Tags}">
+                                     Category: ${item.Tags}
+                                </p>
+                                
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                    card_game.appendChild(li);
+            });
+            paginate = document.getElementById('paginate_row')
+            paginate.innerHTML = ``
+        }
+                
+
+    </script>
+{% endblock %}

@@ -1,5 +1,37 @@
+from fastapi import Request
+from fastapi.templating import Jinja2Templates
 import re
 import requests
+import csv
+import pandas as pd
+import sys
+from model import Action, Category 
+
+
+data = Action.data_game
+categories = Category.category_name[:15]
+web = Jinja2Templates(directory="resources/view")
+
+
+def welcome(request: Request, web:Jinja2Templates):    
+    return web.TemplateResponse("home.html",{"request": request})
+
+def home(request: Request, web: Jinja2Templates, page: int = 1, limit: int = 8):
+    start = (page - 1) * limit
+    end = start + limit 
+    chunk = data.iloc[start:end].to_dict(orient="records")
+    items = {
+        "request": request,
+        "data_list": chunk,
+        "current_page": page,
+        "categories": categories
+    }    
+    return web.TemplateResponse("home.html", items)
+
+
+def get_data_by_category(category: str):
+    data_list = Action.get_data_category(category)
+    return data_list
 
 
 class Crawler:
@@ -79,3 +111,29 @@ class Crawler:
                     break
                 page += 1
         return data
+
+class Export:
+    def export_csv(self, data, file_name):
+        if not data:
+            return
+        fieldnames = data[0].keys()
+        with open(file_name, mode="w", newline="", encoding="utf-8") as file:
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(data)
+
+
+def fetch_data():
+    data_fetch = Crawler()
+    web = data_fetch.fetch("https://oceanofgames.com/")
+    links_cate = data_fetch.crawl_nav(web)
+    data_update = data_fetch.crawl_loop(links_list=links_cate)
+    
+    game_update = Action.update_data(data_update)
+    global data
+    data = game_update
+    return "fetching successfully"
+
+
+    
+# download_data_csv()

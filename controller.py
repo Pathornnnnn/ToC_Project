@@ -1,15 +1,19 @@
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
+import numpy as np
 import re
 import requests
 import csv
 import pandas as pd
 import sys
 from model import Action, Category 
+from pydantic import BaseModel
 
 
 data = Action.data_game
+data_json = Action.data_json
 categories = Category.category_name[:15]
+favorite_list =  []
 web = Jinja2Templates(directory="resources/view")
 
 
@@ -30,8 +34,8 @@ def home(request: Request, web: Jinja2Templates, page: int = 1, limit: int = 8):
 
 
 def get_data_by_category(category: str):
-    data_list = Action.get_data_category(category)
-    return data_list
+    df = Action.get_data_category(category)
+    return df
 
 
 class Crawler:
@@ -111,6 +115,7 @@ class Crawler:
                     break
                 page += 1
         return data
+        print("crawl_loop :",data)
 
 class Export:
     def export_csv(self, data, file_name):
@@ -132,8 +137,34 @@ def fetch_data():
     game_update = Action.update_data(data_update)
     global data
     data = game_update
+    print(data)
     return "fetching successfully"
 
-
-    
 # download_data_csv()
+
+
+class FavoriteRequest(BaseModel):
+    game_id: int
+    
+# ฟังก์ชั่นค้นหาข้อมูลเต็มตาม id list
+def get_full_data_by_ids(ids: list):
+    """
+    รับ ids: list ของ ID (int หรือ str)
+    คืนค่าข้อมูลเต็มจาก data_json
+    ถ้าไม่มี id ใด match จะ return []
+    """
+    if not ids or not isinstance(ids, list):
+        return []
+
+    # ดักกรณี data_json ว่าง
+    if not data_json:
+        return []
+
+    result = []
+    ids_set = set(str(i) for i in ids)  # แปลงทุก id เป็น string เพื่อให้ตรงกับ data_json
+
+    for item in data_json:
+        if str(item.get("ID")) in ids_set:
+            result.append(item)
+
+    return result

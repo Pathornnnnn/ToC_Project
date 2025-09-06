@@ -8,14 +8,16 @@ import pandas as pd
 import sys
 from model import Action, Category 
 from pydantic import BaseModel
-
+from datetime import datetime
+import traceback
+import os
 
 data = Action.data_game
 data_json = Action.data_json
 categories = Category.category_name[:15]
 favorite_list =  []
 web = Jinja2Templates(directory="resources/view")
-
+CSV_FILE = "fetch_date.csv"
 
 def welcome(request: Request, web:Jinja2Templates):    
     return web.TemplateResponse("home.html",{"request": request})
@@ -128,21 +130,6 @@ class Export:
             writer.writerows(data)
 
 
-def fetch_data():
-    data_fetch = Crawler()
-    web = data_fetch.fetch("https://oceanofgames.com/")
-    links_cate = data_fetch.crawl_nav(web)
-    data_update = data_fetch.crawl_loop(links_list=links_cate)
-    
-    game_update = Action.update_data(data_update)
-    global data
-    data = game_update
-    print(data)
-    return "fetching successfully"
-
-# download_data_csv()
-
-
 class FavoriteRequest(BaseModel):
     game_id: int
     
@@ -182,3 +169,55 @@ def favorite_data_export(favorite_list):
         return "export successfully"
     except Exception as e:
         return f"Error during export: {e}"
+
+
+def fetch_data():
+    """ฟังก์ชันดึงข้อมูลจากเว็บ และ update global data"""
+    try:
+        data_fetch = Crawler()
+        web = data_fetch.fetch("https://oceanofgames.com/")
+        links_cate = data_fetch.crawl_nav(web)
+        data_update = data_fetch.crawl_loop(links_list=links_cate)
+
+        game_update = Action.update_data(data_update)
+
+        global data
+        data = game_update
+
+        print("✅ Fetch success, total items:", len(data))
+        return "fetching successfully"
+
+    except Exception as e:
+        error_msg = f"❌ Error while fetching: {e}"
+        traceback.print_exc()
+        return error_msg
+
+
+def safe_read_csv(file):
+    """อ่าน CSV แบบปลอดภัย ไม่เจอ EmptyDataError"""
+    if not os.path.exists(file):
+        return pd.DataFrame()  # ยังไม่มีไฟล์
+    if os.path.getsize(file) == 0:
+        return pd.DataFrame()  # ไฟล์ว่าง
+    try:
+        return pd.read_csv(file)
+    except pd.errors.EmptyDataError:
+        return pd.DataFrame()
+
+def save_fetch_time(source="manual"):
+    """บันทึกเวลา fetch + สถานะ ลง CSV แบบปลอดภัย และคืนเวลาที่ fetch"""
+    result = fetch_data()
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    new_data = pd.DataFrame([{
+        "fetch_time": now,
+        "status": result,
+        "source": source
+    }])
+
+    old_data = safe_read_csv(CSV_FILE)
+    df = pd.concat([old_data, new_data], ignore_index=True)
+    df.to_csv(CSV_FILE, index=False, encoding="utf-8-sig")
+
+    print(f"📝 Logged fetch at {now} | {source} | {result}")
+    return now, result  # <-- คืนค่าเวลาที่ fetch เสร็จ

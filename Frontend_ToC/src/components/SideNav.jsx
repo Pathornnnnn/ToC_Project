@@ -29,9 +29,9 @@ function SideNav() {
             >
               ★ Favorite
             </button>
-            <button className="w-full bg-gray-800 hover:bg-gray-700 text-white py-2 px-3 mb-2 rounded text-left">
+            {/* <button className="w-full bg-gray-800 hover:bg-gray-700 text-white py-2 px-3 mb-2 rounded text-left">
               ⟳ Refresh
-            </button>
+            </button> */}
             <button
               className="w-full bg-gray-800 hover:bg-gray-700 text-white py-2 px-3 mb-2 rounded text-left"
               onClick={() => (window.location.href = "/Listgame/All")}

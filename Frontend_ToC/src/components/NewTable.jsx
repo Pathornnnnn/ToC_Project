@@ -40,7 +40,7 @@ function Table({ games }) {
     try {
       await axios.post(url, { game_id: game.ID });
 
-      const res = await axios.get(`${BACKEND_URL}/favorite/full`);
+      const res = await axios.get("http://127.0.0.1:8000/favorite/full");
       if (Array.isArray(res.data)) {
         setLocalFavorites(res.data.map((g) => g.ID));
       }

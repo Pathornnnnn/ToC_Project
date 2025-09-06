@@ -1,9 +1,11 @@
 import pandas as pd
 import numpy as np
 import sys 
-data_game = pd.read_csv('data.csv')
+import os
 
-df = pd.read_csv('data.csv')
+print("Current working directory:", os.getcwd())
+data_game = pd.read_csv('./data.csv')
+df = pd.read_csv('./data.csv')
 df = df.replace([np.inf, -np.inf], np.nan)
 df["Tags"] = df["Tags"].apply(lambda x: [tag.strip() for tag in x.split(",")] if x else [])
 df = df.where(pd.notnull(df), None)
@@ -24,8 +26,8 @@ def get_data_category(category: str):
 
 def update_data(data: str):
     data_update = pd.DataFrame(data)
-    data_update.to_csv('data.csv', index=False)
+    data_update.to_csv('./data.csv', index=False)
     global data_game
-    data_game = pd.read_csv('data.csv')
+    data_game = pd.read_csv('./data.csv')
 
     return data_game

@@ -22,6 +22,7 @@ Assignment
    * pip install -r requirements.txt
 
 #Run FastAPI
+  * cd .\Backend_ToC\
   * fastapi dev ./api.py
 
 ------------------------------------------------

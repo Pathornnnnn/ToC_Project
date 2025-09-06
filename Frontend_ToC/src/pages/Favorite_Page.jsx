@@ -104,11 +104,47 @@ export default function Favorites() {
                 Reset Favorites
               </button>
               <button
-                onClick={exportCSV}
+                onClick={() => {
+                  fetch(`${BACKEND_URL}/download_Data_Favorite_CSV`)
+                    .then((response) => response.blob())
+                    .then((blob) => {
+                      const url = window.URL.createObjectURL(blob);
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = "favorite.csv"; // ชื่อไฟล์ที่ดาวน์โหลด
+                      document.body.appendChild(a);
+                      a.click();
+                      a.remove();
+                      window.URL.revokeObjectURL(url);
+                    })
+                    .catch((err) => console.error("Download error:", err));
+                }}
                 className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
                 disabled={favoriteGames.length === 0}
               >
-                Export CSV
+                Export Favorite games
+              </button>
+
+              <button
+                onClick={() => {
+                  fetch(`${BACKEND_URL}/download_Data_CSV`)
+                    .then((response) => response.blob())
+                    .then((blob) => {
+                      const url = window.URL.createObjectURL(blob);
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = "data.csv"; // ชื่อไฟล์ที่ดาวน์โหลด
+                      document.body.appendChild(a);
+                      a.click();
+                      a.remove();
+                      window.URL.revokeObjectURL(url);
+                    })
+                    .catch((err) => console.error("Download error:", err));
+                }}
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                disabled={favoriteGames.length === 0}
+              >
+                Export All games
               </button>
             </div>
           </div>

@@ -42,6 +42,11 @@ async def fetch():
 async def download():
     return FileResponse("data.csv", media_type="text/csv", filename="data.csv")
 
+@app.get("/download_Data_Favorite_CSV")
+async def download():
+    controller.favorite_data_export(controller.favorite_list)
+    return FileResponse("favorite.csv", media_type="text/csv", filename="favorite.csv")
+
 
 @app.get("/getdata")
 async def get_data():
@@ -65,8 +70,9 @@ def get_favorites():
 @app.post("/favorite/add")
 def add_favorite(req: controller.FavoriteRequest):
     """เพิ่มเกมเข้า favorite"""
-    if req.game_id not in controller.favorite_list:
-        controller.favorite_list.append(req.game_id)
+    game_id = str(req.game_id)
+    if game_id not in controller.favorite_list:
+        controller.favorite_list.append(game_id)
     return {"favorite_list": controller.favorite_list}
 
 @app.post("/favorite/remove")

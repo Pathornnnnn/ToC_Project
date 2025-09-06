@@ -169,3 +169,16 @@ def get_full_data_by_ids(ids: list):
 
     return result
 
+
+def favorite_data_export(favorite_list):
+    try:
+        data = get_full_data_by_ids(favorite_list)
+        df = pd.DataFrame(data)
+        df['Tags'] = df['Tags'].apply(lambda x: ', '.join(x))
+        df.to_csv('favorite.csv', index=False, encoding='utf-8-sig')
+        print("Exported data.csv successfully!")
+        print("Exported favorite_list.csv successfully.")
+        print(data)
+        return "export successfully"
+    except Exception as e:
+        return f"Error during export: {e}"

@@ -18,11 +18,9 @@ Assignment
      source .venv/bin/activate
 
 #ติดตั้ง Dependencies
-
-   * pip install -r requirements.txt
-
 #Run FastAPI
   * cd .\Backend_ToC\
+  * pip install -r requirements.txt
   * fastapi dev ./api.py
 
 ------------------------------------------------

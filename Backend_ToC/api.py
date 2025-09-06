@@ -16,6 +16,8 @@ app = FastAPI()
 origins = [
     "http://localhost:5173",  # React dev server
     "http://127.0.0.1:5173",  # เผื่อใช้ 127.0.0.1
+    "https://tog-project-eiei.web.app/",  # Firebase Hosting
+    "https://tog-project-eiei.web.app",  # Firebase Hosting แบบไม่มี /
 ]
 
 app.add_middleware(

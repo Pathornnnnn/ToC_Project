@@ -168,3 +168,4 @@ def get_full_data_by_ids(ids: list):
             result.append(item)
 
     return result
+

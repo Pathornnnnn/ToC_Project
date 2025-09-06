@@ -1,22 +1,23 @@
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 
-import Home from "./pages/Home";
-import Favorites from "./pages/Favorites";
-import GameDetail from "./pages/GameDetail";
-import Show_games from "./pages/Show_games";
-import CategoryPage from "./pages/Category";
+import Home from "./pages/Home_Page";
+import ListGame_Page from "./pages/ListGame_Page";
+import Favorite_Page from "./pages/Favorite_Page";
+import Test from "./pages/Test";
+// import Contact_Page from "./pages/Show_games";
+
 export default function App() {
   return (
     <>
       <div className="min-h-screen bg-gray-900 text-white">
-        <Navbar />
-        <div className="p-6">
+        <div className="">
           <Routes>
-            <Route path="/" element={<CategoryPage />} />
-            <Route path="/favorites" element={<Favorites />} />
-            <Route path="/game/:id" element={<GameDetail />} />
-            <Route path="/showgames" element={<Show_games />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/Listgame/:category" element={<ListGame_Page />} />
+            <Route path="/favorites" element={<Favorite_Page />} />
+            <Route path="/test" element={<Test />} />
+            {/* <Route path="/showgames" element={<Contact_Page />} /> */}
           </Routes>
         </div>
       </div>

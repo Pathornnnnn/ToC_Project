@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import GameTable from "../components/GameTable";
-import Navbar from "../components/Navbar";
+import GameTable from "../src/components/GameTable";
+import Navbar from "../src/components/Navbar";
 export default function Show_games() {
   console.log("Show_games");
   const [games, setGames] = useState([]);

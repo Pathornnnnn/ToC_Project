@@ -1,0 +1,12 @@
+/* แท่งเริ่มต้นซ่อน */
+.hidden-bar {
+  transform: translateY(100%);
+  opacity: 0;
+  transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
+}
+
+/* เมื่อ hover group แท่งจะสไลด์ขึ้นเต็ม */
+.group:hover .hidden-bar {
+  transform: translateY(0%);
+  opacity: 1;
+}

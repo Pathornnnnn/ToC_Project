@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import GameTable from "../components/GameTable";
+import GameTable from "../src/components/GameTable";
 
 export default function Favorites() {
   const [favoriteGames, setFavoriteGames] = useState([]);

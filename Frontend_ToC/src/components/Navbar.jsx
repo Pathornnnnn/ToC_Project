@@ -1,18 +1,39 @@
 import { Link } from "react-router-dom";
-
+import "tailwindcss";
 export default function Navbar() {
   return (
-    <nav className="bg-gray-800 px-6 py-3 flex justify-between items-center shadow">
-      <h1 className="text-xl font-bold text-blue-400">🎮 GameCrawler</h1>
-      <div className="space-x-4">
-        <Link to="/" className="hover:text-blue-400">
+    <nav
+      className="bg-gradient-to-r from-gray-900 via-black to-gray-900 
+                    px-8 py-4 flex justify-between items-center 
+                    shadow-lg border-b border-gray-700"
+    >
+      {/* Logo */}
+      <h1
+        className="text-2xl font-extrabold tracking-widest text-blue-400 
+                     hover:text-blue-300 transition-colors duration-300"
+      >
+        🎮 GameCrawler
+      </h1>
+
+      {/* Links */}
+      <div className="space-x-8 text-lg font-semibold">
+        <Link
+          to="/"
+          className="text-gray-600 hover:text-white transition-colors duration-300"
+        >
           Home
         </Link>
-        <Link to="/favorites" className="hover:text-blue-400">
+        <Link
+          to="/favorites"
+          className="text-gray-500 hover:text-white transition-colors duration-300"
+        >
           Favorites
         </Link>
-        <Link to="/showgames" className="hover:text-blue-400">
-          Show_Games
+        <Link
+          to="/Listgame/All"
+          className="text-gray-400 hover:text-white transition-colors duration-300"
+        >
+          Show All Games
         </Link>
       </div>
     </nav>

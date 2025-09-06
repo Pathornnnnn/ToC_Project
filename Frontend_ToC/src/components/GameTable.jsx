@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./gameTable.css";
-
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 function GameTable({ games }) {
   const [localFavorites, setLocalFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +10,7 @@ function GameTable({ games }) {
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const res = await axios.get("http://127.0.0.1:8000/favorite/full");
+        const res = await axios.get(`${BACKEND_URL}/favorite/full`);
         if (Array.isArray(res.data)) {
           setLocalFavorites(res.data.map((g) => g.ID));
         } else {
@@ -38,14 +38,14 @@ function GameTable({ games }) {
     );
 
     const url = alreadyFav
-      ? "http://127.0.0.1:8000/favorite/remove"
-      : "http://127.0.0.1:8000/favorite/add";
+      ? `${BACKEND_URL}/favorite/remove`
+      : `${BACKEND_URL}/favorite/add`;
 
     try {
       await axios.post(url, { game_id: game.ID });
 
       // fetch favorite list ใหม่เพื่อ sync
-      const res = await axios.get("http://127.0.0.1:8000/favorite/full");
+      const res = await axios.get(`${BACKEND_URL}/favorite/full`);
       if (Array.isArray(res.data)) {
         setLocalFavorites(res.data.map((g) => g.ID));
       }

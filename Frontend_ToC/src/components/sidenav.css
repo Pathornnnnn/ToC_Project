@@ -1,0 +1,16 @@
+/* SideNav.css */
+.slide-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 4px;
+  height: 0;
+  background-color: #06b6d4; /* cyan-400 */
+  transition: height 0.3s ease;
+  border-radius: 2px;
+}
+
+/* ตอน hover ให้แท่งขยายเต็มความสูง */
+li:hover .slide-bar {
+  height: 100%;
+}

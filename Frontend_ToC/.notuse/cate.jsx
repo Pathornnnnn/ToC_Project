@@ -1,7 +1,9 @@
 import { useState } from "react";
 import axios from "axios";
-import Category from "../components/category";
-import GameTable from "../components/GameTable";
+import Category from "../src/components/category";
+import GameTable from "../src/components/GameTable";
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export default function CategoryPage() {
   const [games, setGames] = useState([]);
@@ -11,7 +13,7 @@ export default function CategoryPage() {
     setGames([]);
 
     axios
-      .get(`http://127.0.0.1:8000/get_data_by_category/${category}`)
+      .get(`${BACKEND_URL}/get_data_by_category/${category}`)
       .then((response) => {
         setGames(response.data);
       })

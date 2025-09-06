@@ -2,7 +2,7 @@ import "./category.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-function Category({ onSelectCategory }) {
+function Category_home({ onSelectCategory }) {
   const [posts, setPost] = useState([]);
 
   useEffect(() => {
@@ -22,9 +22,8 @@ function Category({ onSelectCategory }) {
           <div
             key={index}
             className="py-4 text-gray-400 hover:text-white transition-colors duration-300"
-            onClick={() => onSelectCategory(post)}
           >
-            {post}
+            <a href={`/Listgame/${post}`}> {post} </a>
           </div>
         ))}
       </div>
@@ -32,4 +31,4 @@ function Category({ onSelectCategory }) {
   );
 }
 
-export default Category;
+export default Category_home;

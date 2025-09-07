@@ -62,7 +62,7 @@ function Table({ games }) {
     return <p className="text-white ml-60 p-4">Loading favorites...</p>;
 
   return (
-    <div className="ml-60 p-6 min-h-screen text-white">
+    <div className="p-4 sm:p-6 lg:p-8 text-white min-h-screen">
       <h1 className="text-4xl font-bold mb-8">THEORY OF GAMES</h1>
 
       <div className="space-y-6">
@@ -72,20 +72,17 @@ function Table({ games }) {
           return (
             <div
               key={game.ID}
-              className="w-full sm:max-w-4xl mx-auto flex flex-col sm:flex-row bg-[#131d22] bg-opacity-100 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow"
+              className="w-full sm:max-w-4xl mx-auto flex flex-col sm:flex-row bg-[#131d22] rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow"
             >
-              {/* Image */}
               <img
                 src={game.Image}
                 alt={game.Title}
-                className="w-full sm:w-48 h-48 object-cover"
+                className="w-full sm:w-48 md:w-56 lg:w-64 h-48 sm:h-48 object-cover"
               />
 
-              {/* Info */}
               <div className="p-4 flex flex-col justify-between flex-1">
                 <div>
                   <h2 className="text-xl font-bold mb-2">{game.Title}</h2>
-
                   <p
                     className={`text-gray-400 text-sm mb-2 ${
                       isExpanded ? "" : "line-clamp-3"
@@ -93,16 +90,6 @@ function Table({ games }) {
                   >
                     {game.Description || "No description available."}
                   </p>
-
-                  {/* Read more / Show less toggle */}
-                  {/* {game.Description && game.Description.length > 100 && (
-                    <button
-                      className="text-cyan-400 text-xs underline mb-2"
-                      onClick={() => toggleExpand(game.ID)}
-                    >
-                      {isExpanded ? "Show less" : "Read more"}
-                    </button>
-                  )} */}
 
                   <div className="mb-3 flex flex-wrap">
                     {game.Tags.map((tag, idx) => (
@@ -115,14 +102,15 @@ function Table({ games }) {
                     ))}
                   </div>
                 </div>
+
                 <button
                   onClick={() => toggleFavorite(game)}
                   className={`flex items-center justify-center gap-2 w-36 py-2 rounded text-sm font-medium border transition-colors
-    ${
-      isFavorited(game)
-        ? "bg-yellow-400 hover:bg-yellow-400 text-black border-yellow-400"
-        : "bg-transparent hover:bg-white hover:text-black text-white border-white"
-    }`}
+              ${
+                isFavorited(game)
+                  ? "bg-yellow-400 hover:bg-yellow-400 text-black border-yellow-400"
+                  : "bg-transparent hover:bg-white hover:text-black text-white border-white"
+              }`}
                 >
                   <img
                     src="/TOC/Save.png"

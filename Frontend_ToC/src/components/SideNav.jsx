@@ -27,7 +27,8 @@ function SideNav() {
               className="w-full bg-gray-800 hover:bg-gray-700 text-white py-2 px-3 mb-2 rounded text-left"
               onClick={() => (window.location.href = "/favorites")}
             >
-              ★ Favorite
+              ★ Favorite <br />
+              📄 Export CSV
             </button>
             {/* <button className="w-full bg-gray-800 hover:bg-gray-700 text-white py-2 px-3 mb-2 rounded text-left">
               ⟳ Refresh
@@ -54,7 +55,10 @@ function SideNav() {
             ))}
           </ul>
         </div>
-        <button className="bg-gray-800 hover:bg-gray-700 w-full mt-6 py-2 rounded text-sm">
+        <button
+          className="bg-gray-800 hover:bg-gray-700 w-full mt-6 py-2 rounded text-sm"
+          onClick={() => (window.location.href = "/contact")}
+        >
           CONTACT US
         </button>
       </aside>

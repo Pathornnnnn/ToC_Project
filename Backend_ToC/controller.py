@@ -143,28 +143,29 @@ def get_full_data_by_ids(ids: list):
     if not ids or not isinstance(ids, list):
         return []
 
-    # ดักกรณี data_json ว่าง
     if not data_json:
         return []
 
     result = []
-    ids_set = set(str(i) for i in ids)  # แปลงทุก id เป็น string เพื่อให้ตรงกับ data_json
-
+    seen_ids = set()
     for item in data_json:
-        if str(item.get("ID")) in ids_set:
+        item_id = str(item.get("ID"))
+        if item_id in ids and item_id not in seen_ids:
             result.append(item)
+            seen_ids.add(item_id)
 
     return result
 
 
 def favorite_data_export(favorite_list):
     try:
-        data = get_full_data_by_ids(favorite_list)
+        # ลบ id ซ้ำออกก่อน export
+        unique_favorite_list = list(dict.fromkeys(favorite_list))
+        data = get_full_data_by_ids(unique_favorite_list)
         df = pd.DataFrame(data)
         df['Tags'] = df['Tags'].apply(lambda x: ', '.join(x))
         df.to_csv('favorite.csv', index=False, encoding='utf-8-sig')
-        print("Exported data.csv successfully!")
-        print("Exported favorite_list.csv successfully.")
+        print("Exported favorite.csv successfully!")
         print(data)
         return "export successfully"
     except Exception as e:

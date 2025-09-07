@@ -62,8 +62,12 @@ async def get_category():
 
 @app.get("/favorite/full")
 def get_full_favorites():
-    """คืนค่า favorite list แบบเต็ม"""
-    full_data = controller.get_full_data_by_ids(controller.favorite_list)
+    """คืนค่า favorite list แบบเต็ม (ไม่ซ้ำ)"""
+    unique_ids = list(dict.fromkeys(controller.favorite_list))
+    print('Con',controller.favorite_list)
+    print('UNI',unique_ids)
+    full_data = controller.get_full_data_by_ids(unique_ids)
+    print('FULL',full_data)
     return full_data
 
 @app.get("/favorite/list")

@@ -104,24 +104,30 @@ export default function ListGame_Page() {
       <div className="absolute inset-0 bg-black opacity-60 z-0"></div>
 
       {/* เนื้อหา */}
-      <div className="relative z-10 flex p-4 mr-60 w-full">
-        <div>
-          <div className="flex justify-between items-center mb-4 text-white">
-            <div className="flex items-center space-x-4">
-              <BackButton />
-              <h1 className="text-3xl font-bold">Category: {category}</h1>
-            </div>
+      <div className="relative z-10 flex flex-col md:flex-row w-full p-4 md:p-6 gap-6">
+        {/* Main content */}
+        <div className="flex-1 flex flex-col">
+          {/* BackButton + Header */}
+          <div className="flex items-center space-x-4 mb-4 text-white">
+            <BackButton />
+            <h1 className="text-3xl font-bold">Category: {category}</h1>
           </div>
 
-          <Table games={currentGames} />
-
-          <Pagination
-            totalPages={totalPages}
-            currentPage={currentPage}
-            onPageChange={setCurrentPage}
-          />
+          {/* Table + Pagination */}
+          <div className="w-full md:w-auto md:max-w-[calc(100%-16rem)]">
+            <Table games={currentGames} />
+            <Pagination
+              totalPages={totalPages}
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+            />
+          </div>
         </div>
-        <SideNav />
+
+        {/* Sidebar */}
+        <div className="flex-none w-full md:w-60 mt-4 md:mt-0">
+          <SideNav />
+        </div>
       </div>
     </div>
   );

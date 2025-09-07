@@ -22,7 +22,7 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,            # หรือ ["*"] ถ้าอยากเปิดทุก origin
+    allow_origins=["*"],            # หรือ ["*"] ถ้าอยากเปิดทุก origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

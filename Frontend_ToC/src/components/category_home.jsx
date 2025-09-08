@@ -22,6 +22,7 @@ function Category_home({ onSelectCategory }) {
           <div
             key={index}
             className="py-4 text-gray-400 hover:text-white transition-colors duration-300"
+            style={{ fontFamily: 'prompt, medium'}}
           >
             <a href={`/Listgame/${post}`}> {post} </a>
           </div>

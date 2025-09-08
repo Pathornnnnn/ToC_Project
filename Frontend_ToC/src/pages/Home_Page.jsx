@@ -5,6 +5,7 @@ import "./css/Home.css";
 import Navbar from "../components/Navbar";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+const VIDEO_URL = import.meta.env.VITE_VIDEO_URL;
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [lastFetch, setLastFetch] = useState(null);
@@ -60,7 +61,7 @@ export default function Home() {
             playsInline
             className="absolute top-0 left-0 w-full h-full object-cover"
           >
-            <source src="/TOC/VDO.mp4" type="video/mp4" />
+            <source src= {`${VIDEO_URL}`} type="video/mp4" />
           </video>
 
           <div className="relative z-10 flex flex-col items-center justify-center h-full text-center">

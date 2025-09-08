@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 function Table({ games }) {
+  // สร้าง state สำหรับรายการเกมที่บันทึกไว้ (favorite)
   const [localFavorites, setLocalFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [expandedDescriptions, setExpandedDescriptions] = useState({}); // NEW
+  const [expandedDescriptions, setExpandedDescriptions] = useState({}); // สำหรับขยาย/ย่อคำอธิบาย
 
+  // โหลดข้อมูล favorite จาก backend เมื่อ component ถูก mount
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
@@ -25,10 +27,13 @@ function Table({ games }) {
     fetchFavorites();
   }, []);
 
+  // ตรวจสอบว่าเกมนี้ถูกบันทึกไว้หรือยัง
   const isFavorited = (game) => localFavorites.includes(game.ID);
 
+  // ฟังก์ชันสำหรับกดปุ่มบันทึก/ยกเลิกบันทึก
   const toggleFavorite = async (game) => {
     const alreadyFav = isFavorited(game);
+    // Update local state immediately
     setLocalFavorites((prev) =>
       alreadyFav ? prev.filter((id) => id !== game.ID) : [...prev, game.ID]
     );
@@ -39,13 +44,13 @@ function Table({ games }) {
 
     try {
       await axios.post(url, { game_id: game.ID });
-
-      const res = await axios.get("http://127.0.0.1:8000/favorite/full");
-      if (Array.isArray(res.data)) {
-        setLocalFavorites(res.data.map((g) => g.ID));
-      }
+      // Don't re-fetch favorites here!
     } catch (err) {
       console.error(err);
+      // Optional: rollback local state if error
+      setLocalFavorites((prev) =>
+        alreadyFav ? [...prev, game.ID] : prev.filter((id) => id !== game.ID)
+      );
     }
   };
 
@@ -56,10 +61,13 @@ function Table({ games }) {
     }));
   };
 
+  // กรองเกมซ้ำ
   const uniqueGames = Array.from(new Map(games.map((g) => [g.ID, g])).values());
 
   if (loading)
-    return <p className="text-white ml-60 p-4">Loading favorites...</p>;
+    return (
+      <p className="text-white ml-60 p-4">กำลังโหลดรายการที่บันทึกไว้...</p>
+    );
   return (
     <div className="p-4 sm:p-6 lg:p-8 text-white min-h-screen">
       <h1 className="text-4xl font-bold mb-8">THEORY OF GAMES</h1>
@@ -87,7 +95,7 @@ function Table({ games }) {
                       isExpanded ? "" : "line-clamp-3"
                     }`}
                   >
-                    {game.Description || "No description available."}
+                    {game.Description || "no description available"}
                   </p>
 
                   <div className="mb-3 flex flex-wrap">

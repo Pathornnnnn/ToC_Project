@@ -4,7 +4,7 @@ export default function Navbar() {
   return (
     <nav
       className="bg-[#151515] bg-opacity-80 px-8 py-4 flex justify-between items-center shadow-lg "
-      style={{ 
+      style={{
         backgroundColor: 'rgba(21, 21, 21, 0.8)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',

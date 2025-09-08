@@ -8,16 +8,14 @@ import pandas as pd
 import sys
 from model import Action, Category 
 from pydantic import BaseModel
-from datetime import datetime
-import traceback
-import os
+
 
 data = Action.data_game
 data_json = Action.data_json
 categories = Category.category_name[:15]
 favorite_list =  []
 web = Jinja2Templates(directory="resources/view")
-CSV_FILE = "fetch_date.csv"
+
 
 def welcome(request: Request, web:Jinja2Templates):    
     return web.TemplateResponse("home.html",{"request": request})
@@ -130,6 +128,21 @@ class Export:
             writer.writerows(data)
 
 
+def fetch_data():
+    data_fetch = Crawler()
+    web = data_fetch.fetch("https://oceanofgames.com/")
+    links_cate = data_fetch.crawl_nav(web)
+    data_update = data_fetch.crawl_loop(links_list=links_cate)
+    
+    game_update = Action.update_data(data_update)
+    global data
+    data = game_update
+    print(data)
+    return "fetching successfully"
+
+# download_data_csv()
+
+
 class FavoriteRequest(BaseModel):
     game_id: int
     
@@ -143,82 +156,16 @@ def get_full_data_by_ids(ids: list):
     if not ids or not isinstance(ids, list):
         return []
 
+    # ดักกรณี data_json ว่าง
     if not data_json:
         return []
 
     result = []
-    seen_ids = set()
+    ids_set = set(str(i) for i in ids)  # แปลงทุก id เป็น string เพื่อให้ตรงกับ data_json
+
     for item in data_json:
-        item_id = str(item.get("ID"))
-        if item_id in ids and item_id not in seen_ids:
+        if str(item.get("ID")) in ids_set:
             result.append(item)
-            seen_ids.add(item_id)
 
     return result
 
-
-def favorite_data_export(favorite_list):
-    try:
-        # ลบ id ซ้ำออกก่อน export
-        unique_favorite_list = list(dict.fromkeys(favorite_list))
-        data = get_full_data_by_ids(unique_favorite_list)
-        df = pd.DataFrame(data)
-        df['Tags'] = df['Tags'].apply(lambda x: ', '.join(x))
-        df.to_csv('favorite.csv', index=False, encoding='utf-8-sig')
-        print("Exported favorite.csv successfully!")
-        print(data)
-        return "export successfully"
-    except Exception as e:
-        return f"Error during export: {e}"
-
-
-def fetch_data():
-    """ฟังก์ชันดึงข้อมูลจากเว็บ และ update global data"""
-    try:
-        data_fetch = Crawler()
-        web = data_fetch.fetch("https://oceanofgames.com/")
-        links_cate = data_fetch.crawl_nav(web)
-        data_update = data_fetch.crawl_loop(links_list=links_cate)
-
-        game_update = Action.update_data(data_update)
-
-        global data
-        data = game_update
-
-        print("✅ Fetch success, total items:", len(data))
-        return "fetching successfully"
-
-    except Exception as e:
-        error_msg = f"❌ Error while fetching: {e}"
-        traceback.print_exc()
-        return error_msg
-
-
-def safe_read_csv(file):
-    """อ่าน CSV แบบปลอดภัย ไม่เจอ EmptyDataError"""
-    if not os.path.exists(file):
-        return pd.DataFrame()  # ยังไม่มีไฟล์
-    if os.path.getsize(file) == 0:
-        return pd.DataFrame()  # ไฟล์ว่าง
-    try:
-        return pd.read_csv(file)
-    except pd.errors.EmptyDataError:
-        return pd.DataFrame()
-
-def save_fetch_time(source="manual"):
-    """บันทึกเวลา fetch + สถานะ ลง CSV แบบปลอดภัย และคืนเวลาที่ fetch"""
-    result = fetch_data()
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    new_data = pd.DataFrame([{
-        "fetch_time": now,
-        "status": result,
-        "source": source
-    }])
-
-    old_data = safe_read_csv(CSV_FILE)
-    df = pd.concat([old_data, new_data], ignore_index=True)
-    df.to_csv(CSV_FILE, index=False, encoding="utf-8-sig")
-
-    print(f"📝 Logged fetch at {now} | {source} | {result}")
-    return now, result  # <-- คืนค่าเวลาที่ fetch เสร็จ

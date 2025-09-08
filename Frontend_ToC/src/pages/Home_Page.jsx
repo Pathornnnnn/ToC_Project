@@ -5,7 +5,7 @@ import "./css/Home.css";
 import Navbar from "../components/Navbar";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-const VIDEO_URL = import.meta.env.VITE_VIDEO_URL;
+const VIDEO_URL = import.meta.env.VITE_LINK_VIDEO;
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [lastFetch, setLastFetch] = useState(null);

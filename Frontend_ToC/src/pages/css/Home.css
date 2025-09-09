@@ -1,12 +1,15 @@
-/* แท่งเริ่มต้นซ่อน */
+/* แท่งเริ่มต้นซ่อน - เริ่มจากตรงกลาง */
 .hidden-bar {
-  transform: translateY(100%);
+  transform: translateY(-50%) scaleY(0);
   opacity: 0;
+  top: 50%;
+  transform-origin: center;
+  border-radius: 4px;
   transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
 }
 
-/* เมื่อ hover group แท่งจะสไลด์ขึ้นเต็ม */
+/* เมื่อ hover group แท่งจะขยายจากตรงกลางไปบนล่างพร้อมกัน */
 .group:hover .hidden-bar {
-  transform: translateY(0%);
+  transform: translateY(-50%) scaleY(1);
   opacity: 1;
 }

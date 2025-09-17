@@ -6,7 +6,7 @@ import ListGame_Page from "./pages/ListGame_Page";
 import Favorite_Page from "./pages/Favorite_Page";
 import Test from "./pages/Test";
 import Contact_Page from "./pages/Contact_Page";
-
+import Footer from "./components/footer";
 export default function App() {
   return (
     <>
@@ -23,6 +23,7 @@ export default function App() {
           </Routes>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

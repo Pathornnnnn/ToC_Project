@@ -24,14 +24,32 @@ def get_data_category(category: str):
 
     return data_by_cate.to_dict(orient="records")
 
-def update_data(data: str):
-    data_update = pd.DataFrame(data)
-    data_update.to_csv('./data.csv', index=False)
-    global data_game , data_json
-    data_game = pd.read_csv('./data.csv')
-    df = pd.read_csv('./data.csv')
-    df = df.replace([np.inf, -np.inf], np.nan)
-    df["Tags"] = df["Tags"].apply(lambda x: [tag.strip() for tag in x.split(",")] if x else [])
-    df = df.where(pd.notnull(df), None)
-    data_json = df.to_dict(orient="records")
-    return data_game
+def update_data(data: list[dict]):
+    if not data or not isinstance(data, list):
+        print("❌ update_data: ไม่พบข้อมูลใหม่")
+        return None
+    
+    try:
+        # แปลง list[dict] → DataFrame
+        data_update = pd.DataFrame(data)
+
+        # บันทึก CSV
+        data_update.to_csv('./data.csv', index=False, encoding="utf-8-sig")
+        print(f"✅ update_data: บันทึก {len(data_update)} records ลง data.csv แล้ว")
+
+        global data_game, data_json
+        data_game = pd.read_csv('./data.csv')
+
+        df = pd.read_csv('./data.csv')
+        df = df.replace([np.inf, -np.inf], np.nan)
+        df["Tags"] = df["Tags"].apply(
+            lambda x: [tag.strip() for tag in x.split(",")] if isinstance(x, str) else []
+        )
+        df = df.where(pd.notnull(df), None)
+
+        data_json = df.to_dict(orient="records")
+        return data_game
+
+    except Exception as e:
+        print("❌ update_data error:", e)
+        return None

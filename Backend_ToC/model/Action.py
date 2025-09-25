@@ -27,7 +27,11 @@ def get_data_category(category: str):
 def update_data(data: str):
     data_update = pd.DataFrame(data)
     data_update.to_csv('./data.csv', index=False)
-    global data_game
+    global data_game , data_json
     data_game = pd.read_csv('./data.csv')
-
+    df = pd.read_csv('./data.csv')
+    df = df.replace([np.inf, -np.inf], np.nan)
+    df["Tags"] = df["Tags"].apply(lambda x: [tag.strip() for tag in x.split(",")] if x else [])
+    df = df.where(pd.notnull(df), None)
+    data_json = df.to_dict(orient="records")
     return data_game

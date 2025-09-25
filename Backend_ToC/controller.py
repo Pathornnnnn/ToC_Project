@@ -182,9 +182,13 @@ def fetch_data():
 
         game_update = Action.update_data(data_update)
 
-        global data
+        global data , data_json
         data = game_update
-
+        df = pd.read_csv('./data.csv')
+        df = df.replace([np.inf, -np.inf], np.nan)
+        df["Tags"] = df["Tags"].apply(lambda x: [tag.strip() for tag in x.split(",")] if x else [])
+        df = df.where(pd.notnull(df), None)
+        data_json = df.to_dict(orient="records")
         print("✅ Fetch success, total items:", len(data))
         return "fetching successfully"
 

@@ -99,14 +99,16 @@ function Table({ games }) {
                   </p>
 
                   <div className="mb-3 flex flex-wrap">
-                    {game.Tags.map((tag, idx) => (
-                      <span
-                        key={idx}
-                        className="bg-blue-600 text-white px-2 py-1 mr-2 mb-2 rounded-full text-xs"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                    {(Array.isArray(game.Tags) ? game.Tags : []).map(
+                      (tag, idx) => (
+                        <span
+                          key={idx}
+                          className="bg-blue-600 text-white px-2 py-1 mr-2 mb-2 rounded-full text-xs"
+                        >
+                          {tag}
+                        </span>
+                      )
+                    )}
                   </div>
                 </div>
 

@@ -7,24 +7,27 @@ import Pagination from "../components/Pagination";
 import BackButton from "../components/BackBtn";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 export default function ListGame_Page() {
   const { category } = useParams();
 
   const [games, setGames] = useState([]);
-  const [validCategories, setValidCategories] = useState([]);
+  const [validCategories, setValidCategories] = useState([]); // ต้องเป็น array
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6; // จำนวนแถวที่จะแสดงต่อหน้า
+  const itemsPerPage = 6;
 
   // โหลด category list
   useEffect(() => {
     axios
       .get(`${BACKEND_URL}/getcategory`)
       .then((response) => {
-        setValidCategories(response.data);
+        // แปลง object → array
+        const data = response.data ? Object.values(response.data) : [];
+        setValidCategories(data);
       })
       .catch((err) => {
         console.error("Error loading categories:", err);
@@ -34,7 +37,11 @@ export default function ListGame_Page() {
 
   // โหลด games ตาม category
   useEffect(() => {
-    if (validCategories.length === 0 && category !== "All") return;
+    if (
+      (validCategories.length === 0 && category !== "All") ||
+      !validCategories
+    )
+      return;
 
     if (!validCategories.includes(category) && category !== "All") return;
 
@@ -47,16 +54,14 @@ export default function ListGame_Page() {
     axios
       .get(url)
       .then((response) => {
-        setGames(response.data);
-        setCurrentPage(1); // reset page ทุกครั้งที่โหลดข้อมูลใหม่
+        setGames(Array.isArray(response.data) ? response.data : []);
+        setCurrentPage(1);
       })
       .catch((err) => {
         console.error("Error fetching games:", err);
         setError(true);
       })
-      .finally(() => {
-        setLoading(false);
-      });
+      .finally(() => setLoading(false));
   }, [category, validCategories]);
 
   // คำนวณข้อมูลที่จะแสดงในแต่ละหน้า
@@ -76,8 +81,7 @@ export default function ListGame_Page() {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
 
-  // Loading, error, invalid category ตามเดิม
-
+  // Loading, error, invalid category
   if (loading) {
     return <div className="text-center text-xl mt-20">Loading...</div>;
   }
@@ -95,6 +99,8 @@ export default function ListGame_Page() {
       </div>
     );
   }
+
+  // ---------------- Render ----------------
   return (
     <div
       className="relative min-h-screen flex bg-cover bg-center"
@@ -115,12 +121,20 @@ export default function ListGame_Page() {
 
           {/* Table + Pagination */}
           <div className="w-full md:w-auto md:max-w-[calc(100%-16rem)]">
-            <Table games={currentGames} />
-            <Pagination
-              totalPages={totalPages}
-              currentPage={currentPage}
-              onPageChange={setCurrentPage}
-            />
+            {games.length === 0 ? (
+              <div className="text-center text-yellow-500 mt-10">
+                กรุณา fetch data ก่อน
+              </div>
+            ) : (
+              <>
+                <Table games={currentGames} />
+                <Pagination
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  onPageChange={setCurrentPage}
+                />
+              </>
+            )}
           </div>
         </div>
 

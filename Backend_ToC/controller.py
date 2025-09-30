@@ -146,7 +146,7 @@ class Export:
 
 
 class FavoriteRequest(BaseModel):
-    game_id: str # เปลี่ยนเป็น str เพื่อให้ตรงกับ ID ที่มาจาก web
+    game_id: int 
 
 
 # ฟังก์ชั่นค้นหาข้อมูลเต็มตาม id list (ใช้ Action.data_json เสมอ)

@@ -11,7 +11,11 @@ import os
 from resources.contact import contacts
 
 web = Jinja2Templates(directory="resources/view")
-
+NO_CACHE_HEADERS = {
+    "Cache-Control": "no-cache, no-store, must-revalidate", # ไม่ต้องเก็บ Cache
+    "Pragma": "no-cache", # สำหรับ HTTP/1.0
+    "Expires": "0" # สำหรับ HTTP/1.0
+}
 app = FastAPI()
 origins = [
     "http://localhost:5173",  # React dev server
@@ -27,6 +31,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
 def get_data(request):
     return request.app.state.data_game
 
@@ -43,14 +49,36 @@ async def fetch():
     return controller.fetch_data()
     
 @app.get("/download_Data_CSV")
-async def download():
-    return FileResponse("data.csv", media_type="text/csv", filename="data.csv")
+async def download_data_csv(): # เปลี่ยนชื่อฟังก์ชันให้เฉพาะเจาะจงขึ้น
+    # เพิ่ม Header สำหรับป้องกันการ Cache
+    headers = {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0"
+    }
+    return FileResponse(
+        "data.csv",
+        media_type="text/csv",
+        filename="data.csv",
+        headers=headers # ใส่ Header เข้าไป
+    )
 
 @app.get("/download_Data_Favorite_CSV")
-async def download():
+async def download_favorite_csv(): # เปลี่ยนชื่อฟังก์ชันให้เฉพาะเจาะจงขึ้น
+    # ต้องมั่นใจว่า favorite_data_export ถูกเรียกเพื่อสร้างไฟล์ก่อน
     controller.favorite_data_export(controller.favorite_list)
-    return FileResponse("favorite.csv", media_type="text/csv", filename="favorite.csv")
-
+    
+    headers = {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0"
+    }
+    return FileResponse(
+        "favorite.csv",
+        media_type="text/csv",
+        filename="favorite.csv",
+        headers=headers # ใส่ Header เข้าไป
+    )
 
 @app.get("/getdata")
 async def get_data():

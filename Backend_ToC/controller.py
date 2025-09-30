@@ -39,8 +39,6 @@ def get_data_by_category(category: str):
     df = Action.get_data_category(category)
     return df
 
-import re
-import requests
 
 class Crawler:
     def fetch(self, url: str) -> str:
@@ -130,6 +128,7 @@ class Crawler:
         print(f"✅ crawl_loop: collected {len(data)} unique items")
         return data
 
+
 class Export:
     def export_csv(self, data, file_name):
         if not data:
@@ -144,22 +143,18 @@ class Export:
 class FavoriteRequest(BaseModel):
     game_id: int
     
-# ฟังก์ชั่นค้นหาข้อมูลเต็มตาม id list
+
+# ฟังก์ชั่นค้นหาข้อมูลเต็มตาม id list (ใช้ Action.data_json เสมอ)
 def get_full_data_by_ids(ids: list):
-    """
-    รับ ids: list ของ ID (int หรือ str)
-    คืนค่าข้อมูลเต็มจาก data_json
-    ถ้าไม่มี id ใด match จะ return []
-    """
     if not ids or not isinstance(ids, list):
         return []
 
-    if not data_json:
+    if not Action.data_json:
         return []
 
     result = []
     seen_ids = set()
-    for item in data_json:
+    for item in Action.data_json:
         item_id = str(item.get("ID"))
         if item_id in ids and item_id not in seen_ids:
             result.append(item)
@@ -172,39 +167,52 @@ def favorite_data_export(favorite_list):
     try:
         # ลบ id ซ้ำออกก่อน export
         unique_favorite_list = list(dict.fromkeys(favorite_list))
-        data = get_full_data_by_ids(unique_favorite_list)
+        data = [
+            item for item in data_json
+            if str(item.get("ID")) in unique_favorite_list
+        ]
+        if not data:
+            return "no favorite data to export"
+
         df = pd.DataFrame(data)
-        df['Tags'] = df['Tags'].apply(lambda x: ', '.join(x))
+        df['Tags'] = df['Tags'].apply(
+            lambda x: ', '.join(x) if isinstance(x, list) else str(x)
+        )
         df.to_csv('favorite.csv', index=False, encoding='utf-8-sig')
         print("Exported favorite.csv successfully!")
-        print(data)
         return "export successfully"
     except Exception as e:
         return f"Error during export: {e}"
 
 
 def fetch_data():
-    """ฟังก์ชันดึงข้อมูลจากเว็บ และ update global data"""
+    """ฟังก์ชันดึงข้อมูลจากเว็บ และ reset global data"""
     try:
         data_fetch = Crawler()
         web = data_fetch.fetch("https://oceanofgames.com/")
         links_cate = data_fetch.crawl_nav(web)
         data_update = data_fetch.crawl_loop(links_list=links_cate)
 
-        # อัพเดต global Action.data_json + sync CSV
-        game_update = Action.update_data(data_update)  # คืนค่า list เสมอ
+        # 🔥 reset ข้อมูลเก่า แล้วใช้แต่ข้อมูลใหม่
+        Action.data_json = data_update or []
+        Action.data_game = pd.DataFrame(Action.data_json)
 
+        # sync ลง CSV จาก Action.data_json
+        Action.save_json_to_csv()
+
+        # sync ตัวแปรใน controller ให้ตรงกับ Action ด้วย
         global data, data_json
-        data = game_update or []  # ป้องกัน None
-        data_json = Action.data_json  # ใช้ source of truth ตรง ๆ
+        data = Action.data_game
+        data_json = Action.data_json
 
-        print("✅ Fetch success, total items:", len(data))
+        print("✅ Fetch success, total items:", len(Action.data_game))
         return "fetching successfully"
 
     except Exception as e:
         import traceback
         traceback.print_exc()
         return f"❌ Error while fetching: {e}"
+
 
 def safe_read_csv(file):
     """อ่าน CSV แบบปลอดภัย ไม่เจอ EmptyDataError"""
@@ -216,6 +224,7 @@ def safe_read_csv(file):
         return pd.read_csv(file)
     except pd.errors.EmptyDataError:
         return pd.DataFrame()
+
 
 def save_fetch_time(source="manual"):
     """บันทึกเวลา fetch + สถานะ ลง CSV แบบปลอดภัย และคืนเวลาที่ fetch"""

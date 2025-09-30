@@ -4,11 +4,29 @@ import numpy as np
 import os
 from typing import List, Dict
 
-DATA_CSV = "./data.csv"
+# ----------------------------------------------------------------------
+# ฟังก์ชันตรวจสอบสภาพแวดล้อม
+# ----------------------------------------------------------------------
+def get_base_path():
+    """
+    คืนค่า base path ที่เหมาะสม
+    - ถ้าเจอ K_SERVICE (Cloud Run) จะใช้ /tmp/
+    - ถ้าไม่เจอ (Local Dev) จะใช้ ./
+    """
+    # K_SERVICE คือ Environment variable ที่ Cloud Run กำหนด
+    if os.environ.get("K_SERVICE"):
+        # Path สัมบูรณ์สำหรับ Cloud Run (ต้องใช้ /tmp เพื่อเขียนได้)
+        return "/tmp/"
+    else:
+        # Path สัมพัทธ์สำหรับ Local (เขียนลงในโฟลเดอร์เดียวกับโค้ด)
+        return "./"
 
-# ------------------------------
-# Global variables
-# ------------------------------
+# ----------------------------------------------------------------------
+# Global Path & Variables
+# ----------------------------------------------------------------------
+BASE_PATH = get_base_path()
+DATA_CSV = os.path.join(BASE_PATH, "data.csv")
+
 data_json: List[Dict] = []      # source of truth
 data_game: pd.DataFrame = pd.DataFrame()  # DataFrame จาก data_json
 

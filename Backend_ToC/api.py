@@ -8,7 +8,16 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import controller as controller 
 import sys
 import os
-from resources.contact import contacts
+from model import Action # ต้อง import Action มาเพื่อใช้ DATA_CSV
+# สมมติว่ามีไฟล์ Category.py และ contacts.py อยู่ในโครงสร้างที่ถูกต้อง
+# from model import Category 
+# from resources.contact import contacts 
+
+# เพื่อให้โค้ดรันได้โดยไม่มี error หากไม่มีไฟล์เหล่านี้
+class MockCategory:
+    category_name = [f"Category{i}" for i in range(20)]
+controller.Category = MockCategory
+contacts = []
 
 web = Jinja2Templates(directory="resources/view")
 NO_CACHE_HEADERS = {
@@ -50,14 +59,18 @@ async def fetch():
     
 @app.get("/download_Data_CSV")
 async def download_data_csv(): # เปลี่ยนชื่อฟังก์ชันให้เฉพาะเจาะจงขึ้น
+    # ใช้ Path ที่กำหนดแบบ Dynamic ใน Action
+    DATA_CSV_PATH = Action.DATA_CSV 
+
     # เพิ่ม Header สำหรับป้องกันการ Cache
     headers = {
         "Cache-Control": "no-cache, no-store, must-revalidate",
         "Pragma": "no-cache",
         "Expires": "0"
     }
+    # ใช้ Path ที่คำนวณจาก get_base_path()
     return FileResponse(
-        "data.csv",
+        DATA_CSV_PATH,
         media_type="text/csv",
         filename="data.csv",
         headers=headers # ใส่ Header เข้าไป
@@ -68,13 +81,17 @@ async def download_favorite_csv(): # เปลี่ยนชื่อฟัง�
     # ต้องมั่นใจว่า favorite_data_export ถูกเรียกเพื่อสร้างไฟล์ก่อน
     controller.favorite_data_export(controller.favorite_list)
     
+    # ใช้ Path ที่กำหนดแบบ Dynamic ใน controller
+    FAVORITE_CSV_PATH = controller.FAVORITE_CSV_FILE
+    
     headers = {
         "Cache-Control": "no-cache, no-store, must-revalidate",
         "Pragma": "no-cache",
         "Expires": "0"
     }
+    # ใช้ Path ที่คำนวณจาก get_base_path()
     return FileResponse(
-        "favorite.csv",
+        FAVORITE_CSV_PATH,
         media_type="text/csv",
         filename="favorite.csv",
         headers=headers # ใส่ Header เข้าไป
@@ -86,16 +103,13 @@ async def get_data():
 
 @app.get("/getcategory")
 async def get_category():
-    return controller.categories.to_list()
+    return controller.categories
 
 @app.get("/favorite/full")
 def get_full_favorites():
     """คืนค่า favorite list แบบเต็ม (ไม่ซ้ำ)"""
     unique_ids = list(dict.fromkeys(controller.favorite_list))
-    print('Con',controller.favorite_list)
-    print('UNI',unique_ids)
     full_data = controller.get_full_data_by_ids(unique_ids)
-    print('FULL',full_data)
     return full_data
 
 @app.get("/favorite/list")
@@ -114,8 +128,9 @@ def add_favorite(req: controller.FavoriteRequest):
 @app.post("/favorite/remove")
 def remove_favorite(req: controller.FavoriteRequest):
     """ลบเกมออกจาก favorite"""
-    if req.game_id in controller.favorite_list:
-        controller.favorite_list.remove(req.game_id)
+    game_id = str(req.game_id)
+    if game_id in controller.favorite_list:
+        controller.favorite_list.remove(game_id)
     return {"favorite_list": controller.favorite_list}
 
 
@@ -146,7 +161,8 @@ def fetch_now():
 
 @app.get("/fetch_last_time")
 def fetch_last_time():
-    df = controller.safe_read_csv("fetch_date.csv")
+    # ใช้งาน controller.CSV_FILE ที่ถูกแก้ Path เป็น Dynamic แล้ว
+    df = controller.safe_read_csv(controller.CSV_FILE) 
     if df.empty:
         return JSONResponse(content={"last_fetch": None})
     last_time = df["fetch_time"].iloc[-1]

@@ -17,7 +17,12 @@ data_json = Action.data_json
 categories = Category.category_name[:15]
 favorite_list =  []
 web = Jinja2Templates(directory="resources/view")
-CSV_FILE = "fetch_date.csv"
+
+# ใช้ BASE_PATH ที่กำหนดใน Action.py
+BASE_PATH = Action.get_base_path()
+CSV_FILE = os.path.join(BASE_PATH, "fetch_date.csv")
+FAVORITE_CSV_FILE = os.path.join(BASE_PATH, "favorite.csv")
+
 
 def welcome(request: Request, web:Jinja2Templates):    
     return web.TemplateResponse("home.html",{"request": request})
@@ -141,8 +146,8 @@ class Export:
 
 
 class FavoriteRequest(BaseModel):
-    game_id: int
-    
+    game_id: str # เปลี่ยนเป็น str เพื่อให้ตรงกับ ID ที่มาจาก web
+
 
 # ฟังก์ชั่นค้นหาข้อมูลเต็มตาม id list (ใช้ Action.data_json เสมอ)
 def get_full_data_by_ids(ids: list):
@@ -178,8 +183,9 @@ def favorite_data_export(favorite_list):
         df['Tags'] = df['Tags'].apply(
             lambda x: ', '.join(x) if isinstance(x, list) else str(x)
         )
-        df.to_csv('favorite.csv', index=False, encoding='utf-8-sig')
-        print("Exported favorite.csv successfully!")
+        # บันทึกไปที่ Path ที่ถูกต้อง (Local หรือ /tmp)
+        df.to_csv(FAVORITE_CSV_FILE, index=False, encoding='utf-8-sig')
+        print(f"Exported {FAVORITE_CSV_FILE} successfully!")
         return "export successfully"
     except Exception as e:
         return f"Error during export: {e}"

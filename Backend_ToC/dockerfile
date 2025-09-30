@@ -1,27 +1,22 @@
-# เลือก base image
+# ใช้ Python base image
 FROM python:3.11-slim
-
-# ตั้ง timezone
-ENV TZ=Asia/Bangkok
-RUN apt-get update && apt-get install -y tzdata \
-    && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
-    && echo $TZ > /etc/timezone \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # ตั้ง working directory
 WORKDIR /app
 
-# คัดลอก requirements
+# คัดลอกไฟล์ requirements
 COPY requirements.txt .
 
 # ติดตั้ง dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# คัดลอก source code ทั้งหมด
+# คัดลอกโค้ดทั้งหมด
 COPY . .
 
-# ตั้ง port สำหรับ Cloud Run
-ENV PORT=8080
-
-# คำสั่งรัน FastAPI
+# คัดลอกไฟล์ CSV ไปยัง /tmp
+COPY data/data.csv /tmp/
+COPY data/favorite.csv /tmp/
+COPY data/fetch_date.csv /tmp/
+COPY data/filtered.csv /tmp/
+# รัน FastAPI ด้วย uvicorn
 CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8080"]

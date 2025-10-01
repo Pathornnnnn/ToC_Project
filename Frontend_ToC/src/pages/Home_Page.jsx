@@ -108,7 +108,7 @@ export default function Home() {
 
           {lastFetch && (
             <p className="mt-4 text-white text-lg drop-shadow-lg">
-              📅 Last fetch: {lastFetch} UTC+3
+              📅 Last fetch: {lastFetch} UTC+0
               <br />
               Fetching may take 3–4 minutes
             </p>

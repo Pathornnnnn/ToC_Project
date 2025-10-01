@@ -27,16 +27,16 @@ export default function Home() {
   // Scroll indicator fade out effect
   useEffect(() => {
     const handleScroll = () => {
-      const scrollIndicator = document.getElementById('scroll-indicator');
+      const scrollIndicator = document.getElementById("scroll-indicator");
       const scrollY = window.scrollY;
-      
+
       if (scrollIndicator) {
         scrollIndicator.style.opacity = Math.max(0, 1 - scrollY / 400);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleDownload = async () => {
@@ -88,13 +88,13 @@ export default function Home() {
             <div className="w-2 h-20 relative overflow-hidden bg-transparent">
               <div className="absolute bottom-0 left-0 w-full h-full bg-white hidden-bar"></div>
             </div>
-            <span 
+            <span
               className="text-white text-5xl font-bold rounded px-3 py-1 transition-all duration-300"
-              style={{ 
-                fontFamily: 'DM Serif Display, serif',
-                letterSpacing: '0.1em',
-                textShadow: '4px 4px 10px rgba(0, 0, 0, 1)'
-              }}            
+              style={{
+                fontFamily: "DM Serif Display, serif",
+                letterSpacing: "0.1em",
+                textShadow: "4px 4px 10px rgba(0, 0, 0, 1)",
+              }}
             >
               {loading ? "Loading..." : "Fetch NOW"}
             </span>
@@ -108,35 +108,39 @@ export default function Home() {
 
           {lastFetch && (
             <p className="mt-4 text-white text-lg drop-shadow-lg">
-              📅 Last fetch: {lastFetch} <br />
+              📅 Last fetch: {lastFetch} UTC
+              <br />
               Fetching may take 3–4 minutes
             </p>
           )}
         </div>
 
         {/* Scroll Indicator */}
-        <div id="scroll-indicator" className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10">
-          <div 
+        <div
+          id="scroll-indicator"
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10"
+        >
+          <div
             className="flex flex-col items-center text-white animate-bounce cursor-pointer hover:scale-110 hover:-translate-y-2 transition-all duration-300"
             onClick={() => {
-              document.getElementById('category-section').scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
+              document.getElementById("category-section").scrollIntoView({
+                behavior: "smooth",
+                block: "start",
               });
             }}
           >
             <span className="text-sm mb-2 drop-shadow-lg">Scroll Down</span>
-            <svg 
-              className="w-6 h-6 drop-shadow-lg" 
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              className="w-6 h-6 drop-shadow-lg"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M19 14l-7 7m0 0l-7-7m7 7V3" 
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 14l-7 7m0 0l-7-7m7 7V3"
               />
             </svg>
           </div>

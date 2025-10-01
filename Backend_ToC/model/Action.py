@@ -103,13 +103,23 @@ def get_data_category(category: str) -> List[Dict]:
     if not data_json:
         return []
 
-    # filter ข้อมูล
-    data_by_cate = [
-        item for item in data_json
-        if isinstance(item.get("Tags"), list) and category in item.get("Tags")
-    ]
-    return data_by_cate
+    data_by_cate = []
+    for item in data_json:
+        tags = item.get("Tags", [])
 
+        # ถ้า Tags เป็น string → แปลงเป็น list
+        if isinstance(tags, str):
+            tags_list = [t.strip() for t in tags.split(",")]
+        # ถ้า Tags เป็น list → ใช้ได้เลย
+        elif isinstance(tags, list):
+            tags_list = [t.strip() for t in tags]
+        else:
+            tags_list = []
+
+        if category in tags_list:
+            data_by_cate.append(item)
+
+    return data_by_cate
 
 # ------------------------------
 # Load CSV ตอนโมดูลถูก import

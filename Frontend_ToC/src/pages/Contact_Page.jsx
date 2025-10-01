@@ -1,42 +1,24 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
 import SideNav from "../components/SideNav";
 import BackButton from "../components/BackBtn";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+// ใช้ข้อมูลที่กำหนดมาแทน fetch
+const contacts = [
+  { name: "นายจารุเดช พนาลัย", id: "67015022" },
+  { name: "นายจิรภัทร จันทกนกากร", id: "67015024" },
+  { name: "นายธนากร รัตนสวัสดิ์", id: "67015060" },
+  { name: "นายภูชิต คงยาง", id: "67015108" },
+  { name: "นายอัครชัย วิเชียรโชติ", id: "67015164" },
+  { name: "นายอธิชนัน จันทมิตร", id: "67015155" },
+  { name: "นายอานัส ศรีสุวรรณ", id: "67015167" },
+  { name: "นายภาธร สมแสน", id: "67015105" },
+  { name: "นาย พีรพัฒน์ เครือแก้ว ณ ลำพูน", id: "67015181" },
+];
+
+// รูปที่ใช้ร่วมกันทุกคน
+const PROFILE_IMG =
+  "https://i.pinimg.com/736x/f9/60/a6/f960a69943d403c421c85108f6dcd185.jpg";
 
 export default function Contact_Page() {
-  const [contacts, setContacts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    axios
-      .get(`${BACKEND_URL}/get_contacts`)
-      .then((response) => {
-        setContacts(response.data);
-      })
-      .catch((err) => {
-        console.error("Error fetching contacts:", err);
-        setError(true);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) {
-    return <div className="text-center text-xl mt-20">Loading...</div>;
-  }
-
-  if (error) {
-    return (
-      <div className="text-center text-red-500 mt-20">
-        Error loading contacts.
-      </div>
-    );
-  }
-
   return (
     <div
       className="relative min-h-screen flex bg-cover bg-center"
@@ -63,10 +45,10 @@ export default function Contact_Page() {
                   key={c.id}
                   className="bg-black/40 border border-white p-4 rounded-lg flex flex-col items-center w-75"
                 >
-                  {/* รูปสี่เหลี่ยมเต็มกรอบ */}
-                  <div className="w-50 h-50 mb-3 overflow-hidden border border-white rounded-lg">
+                  {/* รูป */}
+                  <div className="w-40 h-40 mb-3 overflow-hidden border border-white rounded-lg">
                     <img
-                      src={`./Profile/${c.image}`}
+                      src={PROFILE_IMG}
                       alt={c.name}
                       className="w-full h-full object-cover"
                     />
